@@ -1,0 +1,152 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Java Compiler";
+}
+<link rel="stylesheet" href="~/css/general.css" asp-asp-append-version="true" />
+<div class="main-wrapper">
+    <h1>Java Extended Numerical Compiler and Interpreter<span class="ast">*</span></h1>
+    <h2>
+        Anthony Diep
+    </h2>
+    <p class="font-large">Summary</p>
+    <p>
+        This project uses a CFG to enforce a set of productions for the parser to adhere. While the scanner
+        forms tokens to feed into the parser, the parser creates a parse tree. Once the scanner returns
+        an EOF flag, the parse tree is then traversed to execute its nodes. We can guarentee by now that
+        no compile-time errors exists at this point but dynamic errors can still occur. An environment is maintained
+        throughout the lifespan of the compiler so that after each expression, the values of a defined variable
+        is preserved. 
+    </p>
+    <p class="font-large">Introduction</p>
+    <p>
+        When reading through a program, the compiler must be able to take as input, a stream of characters
+        and somehow convert that stream into a semantically meaningful form for the CPU to process. Additionally,
+        the compiler must recognize any errors it can detect within the source code and immediately throw such error. Errors
+        can range from lexicographical to semantic to static semantic errors. To start, a context-free grammar (CFG)
+        must be created so that the compiler can ahere to a set of production rules. Since the compiler's
+        parser is a type of <em>Pushdown Automata</em>, the parser can continously push and pop nodes in
+        accordance to the grammar. Below is part of the grammar that this project uses.
+    </p>
+    <pre class="code-snippet">
+                prog        : block <br>
+                block       : stmt ';' block <br>
+                            | stmt <br>
+                stmt        : assn <br>
+                            | 'rd' id <br>
+                            | 'wr' expr <br>
+                            | 'if' boolexpr 'then' stmt <br>
+                            | 'if' boolexpr 'then' stmt 'else' stmt <br>
+                            | 'while' boolexpr 'do' stmt <br>
+                            | 'begin' block 'end' 
+                    ...
+            </pre>
+    <p>
+        It follows after the definition of a grammar that the parser can be built. I'll first discuss
+        a little bit about the scanner with respect to the order of compilation before continuing
+        with our discussion with the parser.
+    </p>
+    <p class="font-large">Scanner</p>
+    <p>
+        Compilers such as gcc and g++ employ a preprocessor that removes whitespace,
+        expands macros, and deletes comments to feed into the scanner. Since this project
+        is only a numerical compiler/interpreter, whitespace and comment removals were handled
+        by the scanner and no preprocessor was neccessary to be built to handle macro expansions.
+    </p>
+    <p>
+        The scanner works by keeping a privatized index that tracks the scanner's location
+        throughout the source code. As part of the object orientated design considerations,
+        the primary public method to be called is "next()". Once called, the scanner skips
+        any whitespace until the first non-whitespace character. Once there, the scanner determines
+        the succeeding lexeme's type (whether it's a number, keyword, comment, etc) and forms
+        a token if appropriate. Updation of its privatized index as discussed before is made and
+        the token is returned.
+    </p>
+    <p class="font-large">Parser</p>
+
+    <p>
+        Interpretation of the source code requires the parser to execute alongside the scanner
+        to constantly fetch tokens to form into a parse tree. While this is done, the parser must
+        ensure that the grammar is adhered to or throw an error if any violations occur. Fortunately,
+        designing the parser follows that of designing the grammar. Let's first start at parsing
+        a "prog" according to the grammar. To parse a "prog", the parser must parse a "block". To
+        parse a block, a "stmt" must be parsed, a ';' be matched, and another "block" must be parsed.
+        Parsing a "stmt" requires that an "assn" (assignment) be parsed, or a keyword that starts with
+        'rd' (read), or a 'wr' (write) be parsed and so on. At the end, the code becomes quite skeletal
+        in nature. Anytime a token returned by the scanner does not match that of the grammar, say
+        the scanner returns a number when the parser expects a "stmt", an error can be thrown.
+    </p>
+
+    <p class="font-large">Environment</p>
+    <p>
+        Parsing a program must handle logic relating to that of variable storage and retrieval.
+        Consider the following pseudocode:
+    </p>
+    <pre class="code-snippet">
+                x := 42;
+                /*
+                    Many lines later 
+                */
+                x = 43;
+                print x;
+            </pre>
+    <p>
+        How should the compiler handle a reassignment? One consideration is to traverse through the
+        partially-built parse tree and change a node's state but not only is that solution infeasible
+        but also impossible because the tree is partially built. Instead, we rely on a persisting
+        environment that the parser can freely access. This presents many benefits as reassignments
+        are possible but the parser can also store loops and conditionals in the environment to be
+        later compiled into C code.
+    </p>
+    <p class="font-large">Compilation and Interpretation</p>
+    <p>
+        Let's first focus on how interpretation is done since compiling a language is essentially converting
+        code into another language.
+    </p>
+    <p>
+        Similar to how designing the parser becomes skeletal, so is interpreting a program. To interpret
+        a "prog", a "block" must be interpreted and to do that, a block's production must be interpreted.
+    </p>
+    <p>
+        Another portion of the grammar is:
+    </p>
+    <pre class="code-snippet">
+                fact        : id
+                            | num
+                            | '(' expr ')'
+                            | '-' fact
+            </pre>
+    <p>
+        Here, two productions of a "fact" is that it could either be an <em>id</em> or a <em>num</em>.
+        <em>id</em> and <em>num</em> are two terminals of the grammar so evaluating a <em>fact</em>
+        generates leaves in the parse tree. Once a leaf is generated, the calling functions start to
+        return its values while updating values in the environment. Built in functions such as the
+        previously mentioned <em>wr</em> and <em>rd</em> executes by calling on Java'a System.println method and
+        Java's System.in stream respectively.
+    </p>
+    <p>
+        For compilation of code into a target code, each node of the parse tree is equipped with a toString
+        method which returns the appropriate C code that corresponds with it's functionality. Take for example
+        the <em>wr</em> keyword. To convert this into C code, the pseudocode for the toString method might look
+        like the following:
+    </p>
+    <pre class="code-snippet">
+                return "printf(%g \n, "(double)" + val.toString() );";
+            </pre>
+    <p>
+        So during the process of compiling, each toString method of each node in the parse tree gets called
+        and its return values are appended to the .c file. In addition to the prologue and epilogue of the
+        C file (things such as include and the main function), compilation is thus completed.
+    </p>
+    <p class="font-large">Further discussions</p>
+    <p>
+        So far, the generalities of this project has been discussed. As one might notice, the inclusion of the parse
+        tree's nodes were made along with other functionalities such as the read and write functions. However, as
+        this article wasn't mean to discuss every detail to its individual components, I will stop here.
+
+    </p>
+    <p class="footer">
+        * - This project is not publicly available on my GitHub. Please reach out to me if you're interested in seeing.
+    </p>
+</div>

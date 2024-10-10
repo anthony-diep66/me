@@ -1,0 +1,157 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "BASH Shell";
+}
+<link rel="stylesheet" href="~/css/general.css" asp-asp-append-version="true" />
+<div class="main-wrapper">
+    <h1>BASH Shell<span class="ast">*</span></h1>
+    <h2>Anthony Diep</h2>
+    <p class="font-large">Summary</p>
+    <p>
+        Using the multiprocessing capabilites of the POSIX API, this program
+        emulates the commonly used BASH shell in Linux and MacOS devices. Its support
+        for regular built-in BASH commands such as <em>cd</em>, <em>ls</em>, and <em>echo</em>
+        along with its support for file redirections, background processes, and pipelining
+        makes it a replacement for the regular BASH shell. Unlike the BASH shell, however,
+        this project does not support sub-shell functionalities (commands wrapped in <span>()</span> to
+        denote the creation of a sub-shell) along with curly bracket parenthetical ordering
+        (commands wrapped in <span>{}</span> to denote order of execution). With the exception
+        of those mentioned, this shell behaves as a normal BASH shell.
+    </p>
+    <p class="font-large">Introduction</p>
+    <p>
+        I will discuss two major parts to this project with the latter split into three sub-parts: 1)
+        the structure of a bash command and 2) the major components of the BASH shell. The major components
+        will consist of a) File redirections, b) Background processes, and c) Pipelining. First, the structure
+        of a BASH sequence.
+    </p>
+    <p class="font-large">Structure of a Sequence</p>
+    <p>
+        When examining a BASH sequence such as: <em>$echo hi</em>, it can be clearly seen that <em>echo</em>
+        serves as a function that takes "hi" as an argument. We can easily implement commands such
+        as these through the creation of many modules that are built into the BASH shell. In fact, this
+        is exactly how it's done in the real BASH program as many of the programs found are listed
+        under the /bin directory. While it follows that we can continously build more programs to recreate
+        the features of the real program, we must also account for more complicated sequences of commands. Sequences such
+        as: <em>$sleep 1 & cd /etc ; ls | wc</em> and <em>$cd /etc & sleep 10 & echo 1 ; ls | grep fileName</em> are
+        not possible under our current presumption whereas they are in the real program. So, we first separate
+        the structure of the command into the following grammar.
+    </p>
+    <pre>
+                sequence ::=
+                    pipeline
+                    pipeline &
+                    pipeline ;
+                    pipeline & sequence
+                    pipeline ; sequence
+
+                pipeline ::=
+                    command
+                    command | pipeline
+
+                command ::=
+                    words redir
+                    ( sequence ) redir      # Not implemented
+                    { sequence } redir      # Not implemented
+
+                words ::=
+                    word
+                    words word
+
+                redir ::=
+                    ^                       # empty
+                    < word
+                    > word
+                    < word > word
+            </pre>
+    <p>
+        The preceeding grammar is of a context-free grammar (CFG). This presents us with a good
+        starting point because one such property of a CFG is that it can be recognized by a
+        parser, a form of pushdown automata. In turn, a parser will then be able to separate
+        the parts of a more complicated BASH sequence such as the ones mentioned previously so that
+        each individual part with respect to the grammar can be processed appropriately. For instance,
+        take the first example: <em>$sleep 1 & cd /etc ; ls | wc</em>. Here, we use the parser
+        to process a sequence that is made up of a pipeline containing the command "sleep" with "1"
+        as an argument. After which, another command of "cd" takes "/etc" as an argument takes place. Finally,
+        one last command of "ls" needs to be executed that is then piped into the "wc" command. Note
+        that the characters '&' means that the preceeding command must be backgrounded while ';' means that
+        the preceeding command must be executed sequentially before the succeeding command. Through
+        the correct derivations of the defined CFG, we find that the example sequence is indeed legal
+        and therefore, executable.
+    </p>
+    <p>
+        The CFG that this project uses also supports file redirections which I hadn't mentioned. File
+        redirections in C are handled in a unique way through the use of file descriptors. The functionalities
+        of using the redirections are outlined in the productions rules for "redir". So, according to the CFG,
+        standard inputs and outputs can be redirected with arrows making commands such as: <em>$ls > wc</em> and
+        <em>cat < fileName</em> possible. With all neccessary aspects of the CFG discussed, I'll expand
+        on this topic of file redirections as one of the major components of the BASH shell.
+    </p>
+    <p class="font-large">File Redirections</p>
+    <p>
+        C offers a relatively lower level of abstraction towards the usage of file descriptors enabling deliveries
+        amongst files to the byte. Implementation of this functionality involves using file descriptor related
+        functions of open() and close() as specified by the man pages. In addition to using open() and close(),
+        the project took advantage of the way how the actual commands were being executed with execvp().
+        See, the actual method of calling a command such as "wc" is through the use of execvp() (or similar functions in the family).
+        When called, however, execvp() only returns upon abnormal conditions. Consequently, this means that if we called
+        execvp() after parsing through a sequence and deciding to execute a command, we must then fork
+        the current running process so that the BASH program continues in the parent process and the child process
+        begins to execute the command. In terms of file redirections, this means that file descriptors are opened
+        before the main process forks to ensure that output of the command can be properly redirected into a file
+        while maintaining execution policies.
+    </p>
+    <p class="font-large">Background Processes</p>
+    <p>
+        Another major component of the BASH shell is executing commands within a background process. So as an
+        example, take <em>$sleep 10 ;</em> and <em>$sleep 10 &</em>. While both executes the sleep command
+        at some point, the latter command does not require the parent process to wait for its child to finish
+        its execution before continuing. Rather, after the fork is made, the parent immediately shows the
+        next prompt to the user as with the real BASH shell. While this is a matter of executing the wait()
+        function at the right time as explained in the man pages for wait(), there is one detail that we must
+        account for, how can we prevent the child process from turning into a zombie?
+    </p>
+    <p>
+        When non-backgrounded commands are executed, the parent process waits for the child to be done executing
+        before returning. Doing this allows the parent to account for its child's resources being properly
+        reaped by the CPU so that no dangling child references occur. However, when a parent process doesn't wait for its child
+        and the child finishes its execution, no parent process can account for the child's termination and therefore,
+        the child becomes a zombie. This should be avoided as unpredictable behavior can happen when the zombie's
+        references still exists and can still be used by other processes.
+    </p>
+    <p>
+        Again, the correct method of solving this problem involves using the wait() function with other
+        similar functions in the family. Unfortunately, as this project is private, I will abstain from showing
+        the source code but I will not hesitate to share any more information if you're interested. Please reach
+        out! So, while the process of implementing the background processes involves calling the wait() function
+        at the correct times during the forking process, there is a small but problematic issue that arises that
+        must be accounted for. This project is memory safe and correctly solves the issue with zombies.
+    </p>
+    <p class="font-large">Pipelining</p>
+    <p>
+        Rather than delivering the output of one program onto the terminal, we can instead change the standard
+        inputs and outputs of programs such that the output of one program can be fed into another program.
+        Implementing this feature into the BASH shell is somewhat similar to that of implementing file redirections
+        but much more complicated due to the unidirectional behavior of a pipe and the concurrent execution of programs.
+        If any unused pipes remain open throughout the process, then unexpected behavior occurs. Moreover,
+        we must account that two or more programs may be executing in tandem and that the pipe must account for this
+        behavior. The latter concern leads to a solution involving a fork within the "pipeline level" of execution
+        rather than the "command level" as we have discussed previously. Thus, the project actually does
+        a double fork when executing sequences, one to account for pipelines and another to ensure the continuation
+        of the BASH program after successful command termination. In addressing the former concern that the pipelines
+        behaves in a unidirectional way, we must ensure that the child process, forked from the "pipeline level"
+        of execution, appropriately opens and closes its file descriptors to communicate with adjacent programs.
+    </p>
+    <p class="font-large">Concluding Thoughts</p>
+    <p>
+        So far, I have discussed some of the more major components of this project. I have not yet touched upon
+        how the built-in commands were implemented or how, similar to the real BASH shell, this shell supports
+        history storage and retrieval. As I've written so far about topics from concurrency to the POSIX API, and
+        zombies to pipelining, I'll consider these explanations as sufficient for this article introducing my BASH shell.
+    </p>
+    <p class="footer">
+        * - This project is not publicly available on my GitHub. Please reach out to me if you're interested in seeing.
+    </p>
+</div>

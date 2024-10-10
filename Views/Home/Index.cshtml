@@ -1,0 +1,210 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Anthony Diep";
+}
+
+<link rel="stylesheet" href="~/css/about.css" asp-append-version="true" />
+<div class="top">
+    <header id="hero-header">
+        <img src="~/images/Hero.jpg" id="hero" />
+        <div id="greycolor">
+            <h1>Hello, my name is Anthony!</h1>
+            <p>
+                Feel free to explore my website, I have
+                many things to share and I'm constantly working 
+                on newer and exciting projects to post!
+            </p>
+        </div>
+    </header>
+</div>
+<div class="bot">
+    <div class="main-column">
+        <section class="mbox box sabout">
+            <div class="about">
+                <header>
+                    <h2>About me</h2>
+                </header>
+                <p>Passionate about software development and driven by a curiosity for cutting-edge technologies, I am a Computer Science student based in Boise, Idaho looking to make a positive impact through my work in software development. I enjoy the collaborative and rigorous environment that computer science has to offer. Whether it be inventing complex solutions to problems or innovating on past ideas, I wish to share my passion for coding with others.</p>
+                <p>I am currently actively seeking new career opportunities in the field of software development. If you have a challenging project or a position that aligns with my skills and interests, I would love to connect and explore how I can contribute to your organization's success</p>
+            </div>
+        </section>
+
+        <section class="mbox box sprojects">
+            <div class="projects">
+                <header>
+                    <h2>Projects</h2>
+                </header>
+                <ul class="plist">
+                    <li class="plist-item --nth-child-0">
+                        <a asp-controller="Projects" asp-action="JavaNumericalCompilerInterpreter">
+                            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Facademyera.com%2Fwp-content%2Fuploads%2F2021%2F03%2Fparse-tree-1.png&f=1&nofb=1&ipt=b2b79ee2867ede43dbcab61edda7bc1aea90cc9ab3d0d51dee337652dec7af09&ipo=images" />
+                            <div class="ptitle-desc">
+                                <h3>Java Extended Numerical Interpreter/Compiler</h3>
+                                <h4>Java, C</h4>
+                                <p>
+                                    An all-in-one interpreter and compiler. In the frontend of the compiler, 
+                                    a scanner is used to tokenize user inputted code. A parser is then used to 
+                                    built a parse tree which can then be finally compiled into C code or interpreted.
+                                </p>
+                                <!--
+                                <p>
+                                    An all-in-one interpreter and compiler. Built from Java,
+                                    this project demonstrates my understanding of the frontend and backend
+                                    of a compiler. A scanner is used to read/tokenize user inputted code and
+                                    builds a parse tree using its parser. Depending on the command line arguments
+                                    passed in, this program will interpret the parse tree (like Python or Ruby) or
+                                    create a valid C file that can be executed using a C compiler.
+                                </p>-->
+                            </div>
+                        </a>
+                    </li>
+                    <li class="plist-item --nth-child-1">
+                        <a asp-controller="Projects" asp-action="Graphics">
+                            <img src="~/images/ray.jpg" />
+                            <div class="title-desc">
+                                <h3>C++ Graphics Library with Ray Tracing</h3>
+                                <h4>C++</h4>
+                                <p>
+                                    Developed using C++, this project presents
+                                    a comprehensive graphics library that incorporates a
+                                    ray tracing algorithm to generate breathtaking,
+                                    photorealistic 3D images. Through an intuitive interface,
+                                    users can create and manipulate intricate 3D scenes,
+                                    defining the geometry, materials, and lighting properties.
+                                    This project traverses rays through a virtual scene, interacting
+                                    with objects and computing the color of each pixel, resulting
+                                    in stunning, lifelike images. This project not only demonstrates
+                                    my strong understanding of computer graphics principles but also
+                                    highlights my ability to implement complex algorithms and create
+                                    visually captivating experiences.
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="plist-item --nth-child-2">
+                        <a asp-controller="Projects" asp-action="BASHShell">
+                            <img src="~/images/penguin.jpg" />
+                            <div class="title-desc">
+                                <h3>BASH Shell</h3>
+                                <h4>C</h4>
+                                <p>
+                                    Using the powerful multiprocessing capabilities of the POSIX library,
+                                    this project emulates a simplified version of the BASH shell in Linux.
+                                    Similar to BASH, built-in commands such as: <em>cd</em>, <em>echo</em>, and
+                                    <em>ls</em> are supported. When combined with its support for file redirection,
+                                    background processes, and pipelining, the majority of the BASH shell can be substituted with
+                                    this program's memory-safe functionality. This project demonstrates my thorough understanding of a
+                                    critical component in an operating system.
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="plist-item --nth-child-3">
+                        <a asp-controller="Projects" asp-action="Stockbot">
+                            <img src="~/images/discord.jpg" />
+                            <div class="title-desc">
+                                <h3>StockBot: A Discord Application</h3>
+                                <h4>TypeScript, MongoDB, NodeJS</h4>
+                                <p>
+                                    Leveraging Discord's beginner friendly user interface, StockBot delivers
+                                    up-to-date and realistic stock information for users. Users can easily
+                                    query for information such as price and percent change in regards to a desired
+                                    stock and StockBot will fetch data from RESTful API's to quickly deliver the information.
+                                    StockBot allows users to create and simulate custom portfolios with its use
+                                    of MongoDB to store groups of stocks.
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+
+        <section class="mbox box sprojects">
+            <div class="projects">
+                <header>
+                    <h2>Other Areas of Interests</h2>
+                </header>
+                <ul class="plist">
+                    <li class="plist-item --nth-child-0">
+                        <a asp-controller="Interests" asp-action="Arduino">
+                            <img src="~/images/turret.jpg" />
+                            <div class="ptitle-desc">
+                                <h3>Arduino</h3>
+                                <h4>Arduino, Python</h4>
+                                <p>
+                                    I've always been fascinated with the integration of hardware
+                                    and software projects. Using Python in combination of Intel's OpenCV, a
+                                    real-time computer vision library, I built a fun laser turret that uses facial detection
+                                    to shine a laser onto a target.
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="plist-item --nth-child-1">
+                        <a asp-controller="Interests" asp-action="CompetitiveCoding">
+                            <img src="~/images/codeforces.webp" />
+                            <div class="ptitle-desc">
+                                <h3>Competitive Coding</h3>
+                                <h4>C++</h4>
+                                <p>
+                                    Inspired by competitors such as Tourist and Um-nik, competitive coding was
+                                    what helped me make the decision to pursue computer science as a degree.
+                                    Being a competitive person myself, I enjoy the ultra-fast environment
+                                    of competitive coding while challenging myself with new problems to solve.
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="side-column">
+        <section class="sbox box side">
+            <header>
+                <h2>Contact me:</h2>
+            </header>
+            <ul class="clist">
+                <li class="clist">
+                    <a href="mailto:atdiep66@gmail.com" target="_blank">Email</a>
+                </li>
+                <li class="clist">
+                    <a href="https://github.com/anthony-diep66" target="_blank">Github</a>
+                </li>
+                <li class="clist">
+                    <a href="https://www.linkedin.com/in/anthony-diep66/" target="_blank">LinkedIn</a>
+                </li>
+            </ul>
+        </section>
+
+        <section class="sbox box side">
+            <header>
+                <h2>Technical skills</h2>
+            </header>
+            <ul class="llist">
+                <li class="llist-item">C/C++, Java, Python</li>
+                <li class="llist-item">MySQL, MongoDB</li>
+                <li class="llist-item">Heroku, Azure</li>
+            </ul>
+        </section>
+
+        <section class="sbox box side">
+            <header>
+                <h2>Education</h2>
+                </header>
+            <div class="edu-p">
+            <h4>Bachelors of Science in Computer Science</h4>
+            <p>Boise State University <em>(Aug. 2021 - Present)</em></p>
+            <p>University of Idaho <em>(Aug. 2020 - May 2021)</em></p>
+            </div>
+        </section>
+    </div>
+</div>
+<div class="dm-me">
+
+</div>

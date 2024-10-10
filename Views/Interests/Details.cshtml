@@ -1,0 +1,22 @@
+﻿@model Me.Models.Interest
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<link rel="stylesheet" href="~/css/general.css" asp-append-version="true" />
+
+<main>
+    <div class="container">
+        <h1>
+            @Html.Raw(Model.Name)
+        </h1>
+        <h2>Anthony Diep</h2>
+        @Html.Raw(Model.Description)
+    </div>
+</main>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">List of Projects</a>
+</div>

@@ -1,0 +1,55 @@
+﻿
+/* begin */
+h1 {
+    font-size: 50pt;
+    margin-top: 0em;
+    line-height: 1em;
+}
+
+h2 {
+    margin-bottom: 1.5em;
+}
+
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f5f5;
+    width: 60%;
+    margin: 0 auto;
+    padding: 5%;
+    border-radius: 1em;
+}
+
+img {
+    position: relative;
+    width: 40%;
+    height: 40%;
+    margin: 2em auto;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 14pt;
+}
+
+
+.font-large {
+    font-size: xx-large;
+}
+
+.code-snippet {
+    display: flex;
+    justify-content: center;
+    padding: 3%;
+    border-radius: 5px;
+}
+
+.code-snippet + p {
+    margin-top: 15px;
+}
+
+.ast {
+    font-size: x-large;
+    position: absolute;
+}
